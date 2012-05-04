@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form action="" method="post">
+        {% csrf_token %}
+        {% if require_donor_id %}
+        <div class="archive_div">
+            {{ form.donor_id.errors }}
+            <p>
+                <label for="donor_id">Donor ID:</label>
+                {{ form.donor_id }}
+            </p>
+        </div>
+        {% endif %}
+        <div class="archive_div">
+            <p>
+                <label for="serum">Serum:</label>
+                {{ form.serum }}
+            </p>
+        </div>
+        <div class="archive_div">
+            <p>
+                <label for="plasma">Plasma:</label>
+                {{ form.plasma }}
+            </p>
+        </div>
+        <p><input type="submit" value="Archive" /></p>
+    </form>
+<p>Accession is {{ accession }}</p>
+<p>Count is {{ count }}</p>
+
+{% endblock %}

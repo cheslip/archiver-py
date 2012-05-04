@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        <p>hello {{ user.employee.employee_id }}</p>
+    {% endif %}
+
+    <form action="" method="get">
+        {{ form.account }}
+        {{ form.number }}
+
+        <input type="submit" />
+    </form>
+
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block extrahead %}
+{% comment %}    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var donor_id_accounts = new Array();
+            {% for account in donor_id_accounts %}
+            donor_id_accounts.push({{ account.account_id.id }});
+            {% endfor %}
+            alert(donor_id_accounts);
+            $("#id_account").click(function() {
+                var account_id = parseInt($(this).val());
+                if(jQuery.inArray(account_id, donor_id_accounts)) {
+                    $('#info_window').hide();
+                } else {
+                    $('#info_window').show();
+                }
+            });
+        });
+    </script>{% endcomment %}
+{% endblock %}
+
+{% block content %}
+
+<form action="" method="post">
+{% csrf_token %}
+<div class="archive_div">
+    {% if form.account.error_messages %}<p class="error">{{ form.account.error_messages }}</p>{% endif %}
+    {{ form.account.errors }}
+    <p>
+        <label for="account"{% if form.account.error_messages %} class="error"{% endif %}>Account:</label>
+        {{ form.account }}
+    </p>
+</div>
+<div class="archive_div">
+    {% if form.accession.error_messages %}<p class="error">{{  form.accession.error_messages}}</p>{% endif %}
+    {{ form.accession.errors }}
+    <p>
+        <label for="accession"{% if form.accession.error_messages %} class="error"{% endif %}>Accession:</label>
+        {{ form.accession }}
+    </p>
+</div>
+    <p><input type="submit" value="Archive" class="submit" /></p>
+</form>
+
+{% endblock %}

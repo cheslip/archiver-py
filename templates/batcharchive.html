@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ usertest }}</h1>
+<form action="" method="post">
+    {% csrf_token %}
+{#    {% if form.errors %}<p style="color:red;">Please correct the form</p>{% endif %}#}
+    <div class="archive_div">
+        {% if form.account.error_messages %}<p class="error">{{ form.account.error_messages }}</p>{% endif %}
+    {{ form.account.errors }}
+        <p>
+            <label for="account"{% if form.account.error_messages %} class="error"{% endif %}>Account:</label>
+            {{ form.account }}
+        </p>
+    </div>
+    <div class="archive_div">
+        {% if form.accession.errors %}<p class="error">{{ form.accession.errors }}</p>{% endif %}
+        {{ form.accessions.errors }}
+        <p>
+            <label for="accessions"{% if form.accession.errors %} class="error"{% endif %}>Accessions:</label>
+            {{ form.accessions }}
+        </p>
+    </div>
+    <p><input type="submit" value="Archive" /></p>
+</form>
+
+{% endblock %}

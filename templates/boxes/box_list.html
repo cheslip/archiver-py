@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Boxes</h2>
+    <ul>
+        {% for box in object_list %}
+            <li>Box {{ box.number }} -- {{ box.account.name }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

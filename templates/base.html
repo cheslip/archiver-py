@@ -1,0 +1,39 @@
+<html>
+<head>
+    <title>Archiver</title>
+    {% block extrahead %} {% endblock %}
+</head>
+<body>
+<div id="container">
+    <div id="menu">
+        <ul class="nav">
+            <li class="nav">
+                <a href="/single/">Single</a>
+            </li>
+            <li class="nav">
+                <a href="/batch/">Batch</a>
+            </li>
+            <li class="nav">
+                <a href="/view/">View</a>
+            </li>
+            {% if user.is_authenticated %}
+                {% if user.is_staff %}
+                    <li class="nav">
+                        <a href="/admin/">Admin</a>
+                    </li>
+                {% endif %}
+                <li class="nav">
+                    <a href="/logout/">Logout</a>
+                </li>
+            {% endif %}
+            {% block extramenu %}
+            {% endblock %}
+        </ul>
+    </div>
+    <div id="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+</div>
+</body>
+</html>

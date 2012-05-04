@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block extrahead %}
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(":checkbox").click(function() {
+            //$("#test").load('/view/');
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+    <div id="test">
+    <form>
+        <input type="submit" />
+    </form>
+    </div>
+
+    <h3>{{ account }} - Box {{ box_number }}</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th>Slot</th>
+                <th>Accession</th>
+                {% if donor_id %}<th>Donor ID</th>{% endif %}
+                <th>Type</th>
+                <th>User</th>
+                <th>Date</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for location in box_list %}
+            <tr>
+                <td>
+                    <input type="checkbox" name="loc_id" value="{{ location.id }}" />
+                </td>
+                <td>{{ location.slot }}</td>
+                <td>{{ location.accession }}</td>
+                {% if donor_id %}<td>{{ location.donor_id }}</td>{% endif %}
+                <td>{{ location.tube_type }}</td>
+                <td>{{ location.user }}</td>
+                <td>{{ location.date }}</td>
+                <td>Details</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
