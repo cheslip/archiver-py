@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 import datetime
 
@@ -18,6 +18,7 @@ box_locations = [
 class Box(models.Model):
     account = models.ForeignKey('accounts.Account')
     number = models.IntegerField()
+    finish_date = models.DateField(blank=True)
 
     class Meta:
         verbose_name_plural = "boxes"
@@ -30,9 +31,11 @@ class Box(models.Model):
     def __unicode__(self):
         return "Box " + str(self.number) + " (" + self.account.name + ")"
 
-# Populate box if it was just created
 @receiver(post_save, sender=Box)
 def box_save_receive(sender, **kwargs):
+    """
+    If a box is just created, it gets populated with the list of box_locations
+    """
     created = kwargs.get('created')
     if created:
         box = Box.objects.latest('id')
@@ -64,9 +67,14 @@ class BoxItem(models.Model):
     def __unicode__(self):
         return str(self.id) + " - " + str(self.slot)
 
-
-def get_datetime():
-    date = datetime.datetime.today()
-    date = date.strftime('%Y-%m-%d %H:%M:%S')
-
-    return date
+@receiver(post_save, sender=BoxItem)
+def check_finished(sender, instance, **kwargs):
+    """
+    If the last slot of a box is marked as used, the box is considered
+    finished and saved with the current date as the finish date.
+    """
+    if instance.slot == 'I9':
+        if instance.used:
+            box = instance.box
+            box.finish_date = datetime.date.today()
+            box.save()
