@@ -1,18 +1,30 @@
 {% extends 'base.html' %}
 
+{% block extrahead %}
+    <style type="text/css">
+        .errorlist {
+            color: red;
+            list-style: none;
+        }
+
+    </style>
+{% endblock %}
+
 {% block content %}
     <form action="" method="post">
         {% csrf_token %}
         {% if require_donor_id %}
         <div class="archive_div">
-            {{ form.donor_id.errors }}
+            {% if form.donor_id.errors %}{{ form.donor_id.errors }}{% endif %}
             <p>
                 <label for="donor_id">Donor ID:</label>
                 {{ form.donor_id }}
             </p>
         </div>
         {% endif %}
+
         <div class="archive_div">
+            {{ form.serum.error_messages }}
             <p>
                 <label for="serum">Serum:</label>
                 {{ form.serum }}

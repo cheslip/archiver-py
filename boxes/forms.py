@@ -1,7 +1,5 @@
 from django import forms
-from accounts.models import Account, Settings
-from boxes.models import BoxItem
-from django.forms import ModelForm
+from accounts.models import Account
 
 NUMBER_CHOICES = (
     (0, 0),
@@ -41,20 +39,7 @@ class BatchArchiveForm(forms.Form):
 class ArchiveForm(forms.Form):
     serum = forms.ChoiceField(choices=NUMBER_CHOICES, initial=1)
     plasma = forms.ChoiceField(choices=NUMBER_CHOICES, initial=1)
-    donor_id = forms.CharField(label=(u'Donor ID'), required=False)
-    
-#    def clean_donor_id(self):
-        
-#        data = self.cleaned_data['donor_id']
-#        print "DATA: " + str(data)
-#        
-#        if not data:
-#            print "SHIT"
-#           raise forms.ValidationError('You must enter a donor ID')
-#           
-#       
-#       return data
-
+    donor_id = forms.CharField(label=(u'Donor ID'), required=False, error_messages={'required': 'A donor ID is required'})
 
 class ListForm(forms.Form):
     account = forms.ModelChoiceField(queryset=Account.objects.all().order_by('name'), empty_label=(u'Select Account'), required=True)

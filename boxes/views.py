@@ -66,7 +66,6 @@ def Batch(request):
             # Redirect for archiving accessions
             return HttpResponseRedirect('/archive/')
         else:
-            print form.errors
             return render_to_response('batcharchive.html', {'form': form}, context_instance=RequestContext(request))
 
     else:
@@ -112,8 +111,12 @@ def Archive(request):
                 donor_id = None
 
             account.append(user, serum, plasma, accession, donor_id)
-
-        print form.errors
+        else:
+            context = {'accession': accessions[request.session['count']],
+                       'count': request.session['count'],
+                       'require_donor_id': require_donor_id,
+                       'form': form}
+            return render_to_response('archive.html', context, context_instance=RequestContext(request))
 
     # Redirect to batch_archive when finished
     if request.session['count'] == len(accessions):
