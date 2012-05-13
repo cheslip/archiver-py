@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.views.generic import ListView
-from boxes.forms import SingleArchiveForm, BatchArchiveForm, ArchiveForm, ListForm
+from boxes.forms import SingleArchiveForm, BatchArchiveForm, ArchiveForm, ListForm, Batch2Form
 from boxes.models import Box, BoxItem
 from accounts.models import Account, Settings
 
@@ -55,6 +55,7 @@ def Batch(request):
 
             # Remove empty accession items
             accessions_list = filter(None, accessions_list)
+            accessions_list = list(accessions_list)
 
             # Begin new session
             #request.session.flush()
@@ -128,7 +129,7 @@ def Archive(request):
         if request.session.get('type') == 'single':
             return HttpResponseRedirect('/single/')
 
-        return HttpResponseRedirect(view_url(account.id, box))
+        return HttpResponseRedirect(view_url(account.slug, box))
 
     # Form variables
     form = ArchiveForm()
@@ -141,13 +142,13 @@ def Archive(request):
 
 @login_required()
 def BoxList(request):
-    if request.method == 'GET':
-        form = ListForm(request.GET)
+    if request.method == 'POST':
+        form = ListForm(request.POST)
         if form.is_valid():
             account = form.cleaned_data['account']
             box_number = form.cleaned_data['number']
 
-            return HttpResponseRedirect(view_url(account.id, box_number))
+            return HttpResponseRedirect(view_url(account.slug, box_number))
 
     form = ListForm()
     context = { 'form' : form }
@@ -160,13 +161,15 @@ class BoxListView(ListView):
     template_name = 'boxes/boxitem_list.html'
 
     def get_queryset(self):
-        self.account = get_object_or_404(Account, id=self.args[0])
+
+        self.account = get_object_or_404(Account, slug=self.kwargs['slug'])
         self.settings = Settings.objects.get(account_id=self.account.id)
-        self.box = get_object_or_404(Box, account=self.account, number=self.args[1])
+        self.box = get_object_or_404(Box, account=self.account, number=self.kwargs['box_number'])
 
         return BoxItem.objects.filter(box=self.box)
 
     def get_context_data(self, **kwargs):
+
         context = super(BoxListView, self).get_context_data(**kwargs)
         context['account'] = self.account
         context['box_number'] = self.box.number
@@ -175,5 +178,87 @@ class BoxListView(ListView):
 
         return context
 
-def view_url(account_id, box_number):
-    return '/view/' + str(account_id) + '/' + str(box_number) + '/'
+def view_url(account_slug, box_number):
+    return '/view/' + str(account_slug) + '/' + str(box_number) + '/'
+
+@login_required()
+def Archive2(request):
+    if request.method == 'POST':
+        form = Batch2Form(request.POST)
+        if form.is_valid():
+            # Get form data
+            account = form.cleaned_data['account']
+            accessions_list = request.POST.getlist('accessions')
+
+            # Split accessions by newline characters
+            #accessions_list = accessions_string.split('\r\n')
+
+            # Remove empty accession items
+            accessions_list = filter(None, accessions_list)
+            #accessions_list = list(accessions_list)
+
+            # Begin new session
+            #request.session.flush()
+            request.session['accessions'] = accessions_list
+            request.session['count'] = 0
+            request.session['account'] = account
+            request.session['type'] = 'batch'
+
+            # Redirect for archiving accessions
+            return HttpResponseRedirect('/archive/')
+        else:
+            print "errors: " + form.errors
+            return render_to_response('archive2.html', context_instance=RequestContext(request))
+
+    else:
+        form = BatchArchiveForm()
+        context = {'form': form,
+                   'usertest': request.user.employee.employee_id }
+
+        # Anytime this page is loaded, clear session variables
+        #request.session.flush()
+
+        return render_to_response('batcharchive.html', context, context_instance=RequestContext(request))
+
+@login_required()
+def Batch2(request):
+    if request.method == 'POST':
+        form = Batch2Form(request.POST)
+        if not request.POST.getlist('accessions'):
+            form = Batch2Form
+            is_empty = True
+            context = {'form' : form,
+                       'is_empty' : is_empty}
+            return render_to_response('archive2.html', context, context_instance=RequestContext(request))
+        elif form.is_valid():
+            # Get form data
+            account = form.cleaned_data['account']
+            accessions_list = request.POST.getlist('accessions')
+
+            # Split accessions by newline characters
+            #accessions_list = accessions_string.split('\r\n')
+
+            # Remove empty accession items
+            accessions_list = filter(None, accessions_list)
+            #accessions_list = list(accessions_list)
+
+            # Begin new session
+            #request.session.flush()
+            request.session['accessions'] = accessions_list
+            request.session['count'] = 0
+            request.session['account'] = account
+            request.session['type'] = 'batch'
+
+            # Redirect for archiving accessions
+            return HttpResponseRedirect('/archive/')
+        else:
+            # Reload accession data
+            accessions_list = request.POST.getlist('accessions')
+            accessions_list = filter(None, accessions_list)
+            context = { 'form': form,
+                        'accessions': accessions_list}
+
+            return render_to_response('archive2.html', context, context_instance=RequestContext(request))
+    else:
+        form = Batch2Form()
+        return render_to_response('archive2.html', {'form': form}, context_instance=RequestContext(request))

@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from boxes.models import Box, BoxItem, get_datetime
+from boxes.models import Box, BoxItem
 import datetime
 
 class Terms(models.Model):
@@ -19,6 +19,7 @@ class Terms(models.Model):
 class Account(models.Model):
 
     terms = models.ForeignKey(Terms)
+    slug = models.CharField(max_length=10, help_text="Enter a code to describe account. (e.g. MTF) <em>max 10</em>")
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=200)
     city = models.CharField(max_length=100)
@@ -118,7 +119,7 @@ def account_receive(sender, **kwargs):
         box.save()
 
 class Settings(models.Model):
-    account_id = models.ForeignKey(Account, primary_key=True)
+    account = models.ForeignKey(Account, primary_key=True)
     require_donor_id = models.BooleanField(default=False)
 
     class Meta:

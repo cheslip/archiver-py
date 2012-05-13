@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{{ usertest }}</h1>
+
 <form action="" method="post">
     {% csrf_token %}
-{#    {% if form.errors %}<p style="color:red;">Please correct the form</p>{% endif %}#}
+    <input type="hidden" name="form-type" value="initial-data" />
+    {% if form.errors %}<p style="color:red;">Please correct the form</p>{% endif %}
     <div class="archive_div">
         {% if form.account.error_messages %}<p class="error">{{ form.account.error_messages }}</p>{% endif %}
     {{ form.account.errors }}

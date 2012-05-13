@@ -1,7 +1,4 @@
 from django.conf.urls import patterns, include, url
-from django.views.generic import ListView
-from accounts.models import Account
-from boxes.models import Box, BoxItem
 from boxes.views import BoxListView
 
 # Uncomment the next two lines to enable the admin:
@@ -24,7 +21,9 @@ urlpatterns = patterns('',
 
     url(r'^single/$', 'boxes.views.Single'),
     url(r'^batch/$', 'boxes.views.Batch'),
+    url(r'^batch2/$', 'boxes.views.Batch2'),
     url(r'^archive/$', 'boxes.views.Archive'),
+    url(r'^archive2/$', 'boxes.views.Archive2'),
     url(r'^view/$', 'boxes.views.BoxList'),
-    url(r'^view/(\d+)/(\d+)/$', BoxListView.as_view()),
+    url(r'^view/(?P<slug>\w+)/(?P<box_number>\d+)/$', BoxListView.as_view()),
 )

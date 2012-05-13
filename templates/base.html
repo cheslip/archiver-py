@@ -1,7 +1,24 @@
 <html>
 <head>
     <title>Archiver</title>
+    <style type="text/css">
+        .nav li {
+            display: inline;
+            padding-right: 10px;
+            padding-left: 10px;
+            background-color: #166dc0;
+            border: 1px solid white;
+        }
+        .nav a {
+            text-decoration: none;
+            color: white;
+        }
+        .nav ul {
+            list-style: none none inside;
+        }
+    </style>
     {% block extrahead %} {% endblock %}
+
 </head>
 <body>
 <div id="container">
@@ -11,11 +28,13 @@
                 <a href="/single/">Single</a>
             </li>
             <li class="nav">
-                <a href="/batch/">Batch</a>
+                <a href="/batch2/">Batch</a>
             </li>
+            <a href="/view/">
             <li class="nav">
-                <a href="/view/">View</a>
+                View
             </li>
+            </a>
             {% if user.is_authenticated %}
                 {% if user.is_staff %}
                     <li class="nav">

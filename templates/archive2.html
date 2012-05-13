@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block extrahead %}
+    <script type="text/javascript" xmlns="http://www.w3.org/1999/html"
+            src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var count = 0;
+
+            // Validates input from accession box and generates associated error
+            function validate(accession) {
+                accession = accession.replace(/\s+/g, "");
+                if( accession == "") {
+                    generate_error(4);
+                    return false;
+                } else if( accession.length != 8 || accession == "") {
+                    generate_error(1, accession.length);
+                    return false;
+                } else if( isNaN(accession) ) {
+                    generate_error(2);
+                    return false;
+                } else if( already_exists(accession) ) {
+                    generate_error(3);
+                    return false;
+                } else {
+                    //alert(already_exists(accession));
+                    return accession;
+                }
+            }
+            // Generates error based on error number passed
+            function generate_error(error_num, length) {
+                switch( error_num )
+                {
+                    case 1:
+                        $('#errors').html('<h4>Error: Accession must be 8 characters long (it is '+length+')</h4>');
+                        break;
+                    case 2:
+                        $('#errors').html('<h4>Error: Accession must contain only numbers</h4>');
+                        break;
+                    case 3:
+                        $('#errors').html('<h4>Error: Accession already exists in list</h4>');
+                        break;
+                    case 4:
+                        $('#errors').html('<h4>Error: Input is empty</h4>');
+                        break;
+                }
+            }
+            function already_exists(accession) {
+                var list = new Array();
+                $('#list li').each(function(index, value) {
+                    var list_val = $(this).text();
+                    if (accession === list_val) {
+                        list.push(list_val);
+                    }
+                });
+                return list.length > 0;
+            }
+            function count_list() {
+                var count = 0;
+                $('#list li').each(function(index, value) {
+                    count += 1;
+                });
+                return count;
+            }
+            function goToByScroll(id){
+                // Remove "link" from the ID
+                id = id.replace("link", "");
+                // Scroll
+                $('#list_div').animate({
+                    scrollTop: $("#"+id).offset().top}, 'slow');
+            }
+            // Add count
+            $('#form').append('<span id="count"><b>Count: '+ count_list() + '</b></span>');
+
+            // Form submission
+            $('.form').submit(function(e) {
+
+                // Prevent form from submitting
+                e.preventDefault();
+
+                // Store input value in variable
+                var accession = $('#accession').val();
+                accession = validate(accession);
+                if( !accession ) {
+                    return false;
+                } else {
+                    count = count + 1;
+                    // Add value to #list div and clear errors
+                    $('#errors').empty();
+                    $('#list').append('<li id="'+ accession + '">' + accession + '</li>');
+                    $('#final').append('<input type="hidden" name="accessions" value="' + accession + '" />');
+
+                    // Change count
+                    $('#count').remove();
+                    $('#form').append('<span id="count"><b>Count: '+ count_list() + '</b></span>');
+
+                    // Scroll
+                    goToByScroll(accession);
+
+
+                    // Clear the input box
+                    $('#accession').val("");
+                }
+            });
+
+            $('#list_div').delegate('#list li', 'dblclick', function() {
+                // Get accession value
+                var accession = $(this).text();
+                $(this).remove();
+
+                // Remove form input
+                $('#final input[value="' + accession + '"]').remove();
+
+                // Change count
+                $('#count').remove();
+                $('#form').append('<span id="count"><b>Count: '+ count_list() + '</b></span>');
+            });
+
+            // Clears list div
+            $('#clear').click(function(e) {
+                e.preventDefault();
+                $("#list li").remove();
+
+                // Change count
+                $('#count').remove();
+                $('#form').append('<span id="count"><b>Count: '+ count_list() + '</b></span>');
+            });
+            document.accession_form.accession.focus()
+        });
+    </script>
+    <style type="text/css">
+
+        #form {
+            float: left;
+            background-color: #C0C0C0;
+            padding: 10px;
+            height: 300px;
+            width: 200px;
+        }
+        #form p.note {
+            padding-bottom: 120px;
+        }
+        #list_div {
+            background-color: #C0C0C0;
+            padding: 10px;
+            height: 300px;
+            width:  150px;
+            overflow: auto;
+            float: left;
+        }
+        #list {
+            /*padding-left: 15px;*/
+            margin-top: 0;
+            list-style-position: outside;
+        }
+        #list li {
+            /*background-color: #C0C0C0;*/
+            border-bottom: 1px dotted black;
+        }
+        #errors {
+            clear: left;
+            height: 30px;
+        }
+        #errors h4 {
+            color: red;
+            padding: 0;
+            margin: 0;
+        }
+        #submit_form {
+            clear: left;
+            padding-top: 20px;
+            padding-bottom: 5px;
+            width: 390px;
+        }
+        .error {
+            background-color: #ff3643;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div id="errors">
+{% if is_empty %}<h4>Error: Accession list is empty</h4>{% endif %}
+    {% if form.account.errors %}<h4>Error: Select an account</h4>{% endif %}
+</div>
+<div id="form">
+<form name="accession_form" class="form">
+    <p>
+        <label for="accession">Accession:</label>
+        <input type="text" id="accession" name="accession" size="10" />
+    </p>
+    <p>
+        <input type="submit" id="submit" value="Append" />
+        <input type="submit" id="clear" value="Clear" />
+    </p>
+</form>
+    <p class="note"><em>double-click an accession number to remove it</em></p><br>
+</div>
+<div id="list_div">
+<ol id="list">
+    {% if accessions %}
+    {% for accession in accessions %}
+        <li>{{ accession }}</li>
+    {% endfor %}
+    {% endif %}
+</ol>
+</div>
+<div id="submit_form" {% if form.account.errors %}class="error"{% endif %}>
+<form id="final" action="" method="post">
+    {% csrf_token %}
+    {{ form.account }}
+    {% if accessions %}
+        {% for accession in accessions %}
+            <input type="hidden" name="accessions" value="{{ accession }}" />
+        {% endfor %}
+    {% endif %}
+    <input type="submit" id="final_submit" name="final_submit" value="Begin archiving" />
+</form>
+</div>
+
+{% endblock %}

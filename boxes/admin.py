@@ -14,7 +14,7 @@ class BoxItemInline(admin.TabularInline):
     }
 
 class BoxAdmin(admin.ModelAdmin):
-    fields = 'account', 'number'
+    fields = 'account', 'number', 'finish_date'
     list_filter = ['account']
     inlines = [BoxItemInline]
 

@@ -10,7 +10,7 @@ class SettingsInline(admin.StackedInline):
 
 class AccountAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None,              {'fields': ['name']}),
+        (None,              {'fields': ['name', 'slug']}),
         ('Contact Info',    {'fields': ['address', 'city', 'state', 'zip', 'phone', 'email']}),
         ('Terms',           {'fields': ['terms']}),
     ]

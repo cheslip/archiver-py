@@ -1,11 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    {% if user.is_authenticated %}
-        <p>hello {{ user.employee.employee_id }}</p>
-    {% endif %}
 
-    <form action="" method="get">
+    <form action="" method="post">
+        {% csrf_token %}
         {{ form.account }}
         {{ form.number }}
 

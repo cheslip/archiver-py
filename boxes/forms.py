@@ -12,7 +12,7 @@ NUMBER_CHOICES = (
 
 class SingleArchiveForm(forms.Form):
     account = forms.ModelChoiceField(queryset=Account.objects.all(), empty_label=(u'Select Account'), required=True)
-    accession = forms.CharField(label=(u'Accession'), required=True)
+    accession = forms.CharField(label=(u'Accession'), required=True, min_length=8, max_length=8)
 
 class BatchArchiveForm(forms.Form):
     account = forms.ModelChoiceField(queryset=Account.objects.all(), empty_label=(u'Select Account'))
@@ -44,3 +44,13 @@ class ArchiveForm(forms.Form):
 class ListForm(forms.Form):
     account = forms.ModelChoiceField(queryset=Account.objects.all().order_by('name'), empty_label=(u'Select Account'), required=True)
     number = forms.IntegerField(label=(u'Box Number'), required=True)
+
+class Batch2Form(forms.Form):
+    account = forms.ModelChoiceField(queryset=Account.objects.all(), empty_label=(u'Select account'), required=True)
+    accessions = forms.MultipleHiddenInput()
+
+    def clean_accessions(self):
+        data = self.cleaned_data('accessions')
+        print "data"
+        print data
+
